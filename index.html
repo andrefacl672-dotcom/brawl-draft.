@@ -1,904 +1,772 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Paiply Asistente de Draft</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&display=swap');
 
-:root{
-  --bg:#030716;--panel:#07132d;--panel2:#0b1b3d;--line:#173d73;
-  --cyan:#00d9ff;--blue:#1688ff;--purple:#7b3cff;--pink:#d83cff;
-  --red:#ff315c;--yellow:#ffd52a;--text:#f5f8ff;--muted:#8fa5c9;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;min-height:100vh;color:var(--text);
-  font-family:Rajdhani,Arial,sans-serif;
-  background:
-    radial-gradient(circle at 70% 10%,#25105c55 0,transparent 28%),
-    radial-gradient(circle at 25% 60%,#003d7650 0,transparent 30%),
-    linear-gradient(135deg,#02040d,#050b1d 55%,#02040c);
-}
-body:before{
-  content:"";position:fixed;inset:0;pointer-events:none;opacity:.32;
-  background-image:linear-gradient(#fff0 95%,#00d9ff12 100%);
-  background-size:100% 6px;z-index:20;
-}
-header{
-  position:relative;margin-left:190px;padding:20px 28px 18px;text-align:left;
-  background:linear-gradient(180deg,#071538f2,#030918e8);
-  border-bottom:2px solid #104e92;box-shadow:0 8px 30px #000b;z-index:2;
-}
-header h1{
-  margin:0;color:var(--cyan);font-family:'Press Start 2P',monospace;
-  font-size:clamp(19px,3vw,34px);line-height:1.35;
-  text-shadow:4px 4px 0 #073d7c,0 0 18px #00d9ff66;
-}
-header h1:after{content:" ASISTENTE DE DRAFT";color:#fff;font-size:.48em;text-shadow:3px 3px 0 #5324a5}
-header p{margin:7px 0 0;color:#8eeaff;font-size:17px;font-weight:700;letter-spacing:1px}
-.lang{
-  position:absolute;right:25px;top:20px;width:auto!important;
-  background:#07142d!important;border:2px solid #285a9b!important;
-  padding:9px 12px!important;border-radius:5px!important;color:#fff!important;
-  font-weight:800;
-}
-.lang:focus{border-color:var(--cyan)!important}
-#sidebar{
-  position:fixed;left:0;top:0;bottom:0;width:190px;z-index:30;
-  background:linear-gradient(180deg,#06102b,#030817);
-  border-right:2px solid #15457e;padding:18px 10px;overflow:auto;
-}
-#sidebar .brand{
-  font-family:'Press Start 2P',monospace;color:var(--cyan);font-size:18px;
-  text-align:center;margin:6px 0 25px;text-shadow:3px 3px #43239a;
-}
-#sidebar .coin{
-  margin:0 auto 22px;width:76px;height:50px;border:3px solid var(--purple);
-  display:grid;place-items:center;color:#fff;font-family:'Press Start 2P';font-size:10px;
-  box-shadow:0 0 18px #7b3cff66;background:#09173a;
-}
-.navbtn{
-  display:block;width:100%;padding:13px 9px;margin:4px 0;text-align:left;
-  border:1px solid transparent;border-radius:4px;background:transparent;color:#91a5c8;
-  font-family:Rajdhani;font-size:15px;font-weight:800;letter-spacing:.7px;cursor:pointer;
-}
-.navbtn:hover,.navbtn.active{
-  color:#fff;background:linear-gradient(90deg,#0755a9,#071a3b);
-  border-color:#158fff;box-shadow:inset 4px 0 var(--cyan),0 0 12px #007cff22;
-}
-main{max-width:1250px;margin:0 auto;margin-left:190px;padding:24px 25px 0}
-.card{
-  background:linear-gradient(145deg,#071a39eF,#040c20f5);
-  border:1px solid #17477f;border-radius:8px;padding:22px;margin-bottom:17px;
-  box-shadow:0 12px 35px #0008,0 0 22px #003d7620;
-}
-.hero{border-color:#1765ae}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-.eyebrow{font-family:'Press Start 2P';font-size:10px;color:var(--cyan);letter-spacing:1px}
-.section-head h2{margin:7px 0 0;font-family:'Press Start 2P';font-size:19px;line-height:1.5}
-.muted,.small{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.two{grid-template-columns:repeat(2,1fr)}.three{grid-template-columns:repeat(3,1fr)}
-label{display:flex;flex-direction:column;gap:7px;color:#c8d9f4;font-size:14px;font-weight:800}
-select,input,textarea{
-  width:100%;padding:12px 13px;border-radius:5px;border:2px solid #1a477f;
-  background:#030b1c;color:#fff;outline:none;font-family:Rajdhani;font-weight:700
-}
-select:focus,input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #00d9ff18}
-h3{margin:20px 0 10px}.step{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:900}
-.step span:first-child{
-  display:grid;place-items:center;width:32px;height:32px;border-radius:4px;
-  background:linear-gradient(135deg,var(--cyan),var(--blue));color:#02102a;
-  border:2px solid #7ff3ff;box-shadow:0 0 12px #00d9ff55;
-}
-.format-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0 22px}
-.format-btn{
-  padding:18px 10px;background:#06132d;color:#c8d9f4;border:2px solid #1a477f;
-  border-radius:6px;font-family:'Press Start 2P';font-size:11px;line-height:1.7;
-}
-.format-btn.active{
-  background:linear-gradient(135deg,#087fc9,#1740c0);color:#fff;border-color:var(--cyan);
-  box-shadow:0 0 20px #00d9ff3b,inset 0 0 20px #00d9ff12;
-}
-.slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.slot-grid label{
-  background:linear-gradient(145deg,#061a39,#06102a);border:2px solid #1459a1;
-  padding:12px;border-radius:6px
-}
-.slot-grid select{margin-top:2px}
-.bans{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.banbox{position:relative}.banbox span{
-  position:absolute;right:10px;top:9px;color:var(--red);font-size:11px;
-  font-weight:900;pointer-events:none
-}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-button,.file{
-  padding:13px 17px;border:2px solid #39e8ff;border-radius:5px;
-  background:linear-gradient(135deg,#00a8f0,#1453dd);color:#fff;font-weight:900;
-  cursor:pointer;font-family:Rajdhani;font-size:15px;letter-spacing:.6px;
-  box-shadow:0 0 14px #008cff30
-}
-button:hover,.file:hover{filter:brightness(1.15);transform:translateY(-1px)}
-.primary{min-width:210px;font-family:'Press Start 2P';font-size:10px}
-.secondary{background:#111f3d;border-color:#31527e}.danger{background:#8d1640;border-color:#ff4771}
-.file input{display:none}.hidden{display:none}
-.rec{
-  border:2px solid #185f9d;border-left:6px solid var(--yellow);
-  padding:18px;background:#030b1c;border-radius:6px
-}
-.score{font-size:42px;font-weight:900;color:var(--yellow);text-shadow:0 0 14px #ffd52a55}
-.rank{display:grid;gap:8px}.rank div{
-  display:flex;justify-content:space-between;padding:12px 14px;
-  background:#06142c;border:1px solid #17477f;border-radius:5px
-}
-.tag{display:inline-block;padding:5px 9px;border-radius:3px;background:#10284d;margin:3px;font-size:12px}
-.admin{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.full{grid-column:1/-1}
-details summary{cursor:pointer;font-weight:900;font-size:16px;color:#cbe8ff}
-.map-info{margin-top:7px;font-size:12px;color:var(--muted)}.loading{color:var(--yellow)}
-footer{margin-left:190px;text-align:center;padding:25px;color:#56739f;font-size:12px}
-#stepsbar{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:16px;
-  background:#07132b;border:1px solid #16477d;border-radius:5px;overflow:hidden
-}
-#stepsbar div{padding:13px 10px;color:#7895bd;border-right:1px solid #16477d;font-weight:900}
-#stepsbar div.active{color:#fff;background:linear-gradient(90deg,#0755a9,#0b2450)}
-#stepsbar b{
-  display:inline-grid;place-items:center;width:25px;height:25px;margin-right:7px;
-  border-radius:3px;background:#263755;color:#fff
-}
-#stepsbar .active b{background:var(--cyan);color:#031229}
-.pixel-note{
-  border:1px dashed #2369a8;background:#04122a;padding:10px 13px;color:#8fc8ff;
-  font-weight:700;border-radius:4px
-}
-@media(max-width:900px){
-  #sidebar{position:static;width:auto;height:auto;display:flex;gap:5px;padding:8px;overflow-x:auto}
-  #sidebar .brand,#sidebar .coin{display:none}
-  .navbtn{min-width:max-content;width:auto;padding:10px 12px;text-align:center}
-  header,main,footer{margin-left:0}
-  header{text-align:center}.lang{position:static;display:block;margin:0 auto 12px}
-  .grid,.admin{grid-template-columns:1fr 1fr}
-}
-@media(max-width:600px){
-  .grid,.two,.three,.admin,.format-grid,.slot-grid,.bans{grid-template-columns:1fr}
-  .card{padding:15px}.section-head h2{font-size:14px}
-  #stepsbar{grid-template-columns:1fr 1fr}
-  #stepsbar div{font-size:12px}
-}
+    <meta charset="UTF-8">
 
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
+    <meta name="theme-color"
+          content="#0f172a">
 
-/* Paiply flotante: arrastrable y táctil */
+    <meta
+        name="description"
+        content="Paiply Draft Pro | La mejor aplicación para Brawl Stars">
 
-/* Paiply flotante: arrastrable y pulsable */
-#floatingBit{
-  position:fixed;left:auto;top:auto;right:24px;bottom:24px;
-  width:86px;height:86px;z-index:9999;touch-action:none;cursor:grab;
-  user-select:none;filter:drop-shadow(0 0 12px #00d9ff66);
-}
-#floatingBit.dragging{cursor:grabbing;filter:drop-shadow(0 0 18px #7b3cffaa)}
-#floatingBit .bit-orb{
-  width:100%;height:100%;display:grid;place-items:center;
-  border:3px solid #54f2ff;border-radius:22px;
-  background:linear-gradient(145deg,#173e83,#09152e 65%);
-  box-shadow:inset 0 0 0 4px #15285a, inset 0 0 18px #00d9ff44,0 0 0 3px #4a26a0;
-  image-rendering:pixelated;position:relative;overflow:hidden;
-}
-#floatingBit .bit-orb:before{
-  content:"";position:absolute;inset:7px;border:2px dashed #00d9ff55;border-radius:15px;
-}
-#floatingBit svg{width:72px;height:72px;position:relative;z-index:1;image-rendering:pixelated}
-#floatingBit .bit-speech{
-  position:absolute;right:0;bottom:96px;width:min(270px,calc(100vw - 30px));
-  padding:13px 15px;background:#07132d;border:2px solid var(--cyan);
-  border-radius:5px;color:#fff;box-shadow:5px 5px 0 #4b2697,0 0 20px #00d9ff25;
-  font-family:Rajdhani,Arial,sans-serif;font-size:16px;font-weight:700;
-  line-height:1.25;opacity:0;transform:translateY(8px) scale(.96);
-  pointer-events:none;transition:opacity .16s,transform .16s;
-}
-#floatingBit.show-message .bit-speech{opacity:1;transform:translateY(0) scale(1)}
-#floatingBit .bit-speech strong{
-  display:block;color:var(--cyan);font-family:'Press Start 2P',monospace;
-  font-size:9px;line-height:1.8;margin-bottom:7px;
-}
-#floatingBit .bit-speech:after{
-  content:"";position:absolute;right:25px;bottom:-9px;width:14px;height:14px;
-  background:#07132d;border-right:2px solid var(--cyan);border-bottom:2px solid var(--cyan);
-  transform:rotate(45deg);
-}
-@media(max-width:600px){
-  #floatingBit{width:72px;height:72px;right:14px;bottom:16px}
-  #floatingBit svg{width:60px;height:60px}
-  #floatingBit .bit-speech{bottom:82px}
-}
+    <title>Paiply Draft Pro</title>
 
-</style>
+    <!-- Google Fonts -->
 
-<style>
-/* PAIPLY FINAL UI */
-.welcome-card{
-  margin:18px auto 20px;
-  max-width:980px;
-  padding:22px 24px;
-  border:1px solid rgba(88,214,255,.28);
-  border-radius:18px;
-  background:linear-gradient(135deg,rgba(18,27,54,.96),rgba(39,20,66,.92));
-  box-shadow:0 10px 30px rgba(0,0,0,.22);
-}
-.welcome-kicker{font-size:.78rem;font-weight:800;letter-spacing:.14em;opacity:.8}
-.welcome-card h2{margin:7px 0 8px;font-size:1.55rem}
-.welcome-card p{margin:0;opacity:.9;line-height:1.55}
-.welcome-tip{margin-top:13px;font-size:.88rem;opacity:.8}
-.settings-panel{
-  position:fixed;right:18px;top:50%;transform:translateY(-50%);
-  z-index:900;
-  width:190px;padding:14px;
-  border:1px solid rgba(88,214,255,.28);
-  border-radius:16px;
-  background:rgba(12,17,35,.94);
-  backdrop-filter:blur(10px);
-  box-shadow:0 12px 32px rgba(0,0,0,.3);
-}
-.settings-title{font-weight:900;font-size:.9rem;letter-spacing:.08em;margin-bottom:12px}
-.settings-row{display:flex;flex-direction:column;gap:6px;margin:10px 0;font-size:.78rem}
-.settings-row select{
-  width:100%;padding:8px 9px;border-radius:9px;
-  border:1px solid rgba(255,255,255,.14);
-  background:#171d36;color:inherit;
-}
-@media(max-width:900px){
-  .settings-panel{position:static;transform:none;width:auto;margin:14px 12px}
-  .welcome-card{margin:14px 12px}
-}
-</style>
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
-<style>
-/* AJUSTES EN ESQUINA IZQUIERDA */
-.settings-panel{
-  position:fixed !important;
-  left:18px !important;
-  right:auto !important;
-  top:18px !important;
-  transform:none !important;
-  z-index:900;
-}
-@media(max-width:900px){
-  .settings-panel{
-    position:static !important;
-    width:auto !important;
-    margin:14px 12px !important;
-  }
-}
-</style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
 
+    <!-- CSS -->
 
-<style>
-/* AJUSTES: boton grande + menu desplegable arcade */
-.settings-toggle{
-  position:fixed;left:16px;top:16px;z-index:1200;
-  min-width:150px;padding:14px 18px;
-  border:1px solid rgba(92,220,255,.45);border-radius:12px;
-  background:linear-gradient(180deg,#182346,#10172f);color:#fff;
-  font-weight:900;font-size:.9rem;letter-spacing:.08em;
-  cursor:pointer;box-shadow:0 8px 25px rgba(0,0,0,.35),0 0 18px rgba(88,214,255,.08);
-}
-.settings-toggle:hover{transform:translateY(-1px);border-color:rgba(92,220,255,.8);}
-.settings-toggle:active{transform:translateY(1px);}
-.settings-panel{
-  position:fixed !important;left:16px !important;top:78px !important;right:auto !important;
-  z-index:1199;width:300px !important;padding:0 !important;overflow:hidden;
-  border:1px solid rgba(92,220,255,.38) !important;border-radius:16px !important;
-  background:linear-gradient(180deg,rgba(20,27,54,.99),rgba(10,15,33,.99)) !important;
-  box-shadow:0 18px 45px rgba(0,0,0,.5),0 0 28px rgba(88,214,255,.10) !important;
-  opacity:0;visibility:hidden;transform:translateY(-10px) scale(.98) !important;
-  transition:opacity .18s ease,transform .18s ease,visibility .18s ease;
-  pointer-events:none;
-}
-.settings-panel.open{opacity:1;visibility:visible;transform:translateY(0) scale(1) !important;pointer-events:auto;}
-.settings-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.09);background:rgba(88,214,255,.07);}
-.settings-title{font-weight:900;font-size:1rem;letter-spacing:.12em;margin:0 !important;}
-.settings-close{border:0;background:transparent;color:#fff;font-size:1.2rem;cursor:pointer;opacity:.75;padding:3px 6px;border-radius:7px;}
-.settings-close:hover{opacity:1;background:rgba(255,255,255,.08);}
-.settings-row{display:flex;flex-direction:column;gap:8px;padding:14px 18px;margin:0 !important;font-size:.82rem;}
-.settings-row span{font-size:.72rem;opacity:.68;text-transform:uppercase;letter-spacing:.1em;}
-.settings-row select{box-sizing:border-box;width:100%;padding:11px 12px !important;border-radius:9px !important;background:#10162d !important;color:inherit;border:1px solid rgba(255,255,255,.14) !important;outline:none;}
-.settings-row select:focus{border-color:rgba(92,220,255,.65) !important;box-shadow:0 0 0 2px rgba(92,220,255,.08);}
-@media(max-width:900px){
-  .settings-toggle{left:12px;top:12px;min-width:145px;}
-  .settings-panel{left:12px !important;top:70px !important;width:min(300px,calc(100vw - 24px)) !important;}
-}
-</style>
+    <link rel="stylesheet"
+          href="css/style.css">
 
+    <!-- Manifest -->
 
-<style id="title-enhance">
-/* Título principal más llamativo */
-.brand-title{
-  position:relative !important;
-  display:inline-block !important;
-  margin:18px auto 12px !important;
-  padding:14px 28px !important;
-  font-weight:1000 !important;
-  font-size:clamp(1.35rem,3.5vw,2.25rem) !important;
-  letter-spacing:.04em !important;
-  text-transform:uppercase !important;
-  color:#f4fbff !important;
-  text-shadow:0 0 8px rgba(92,220,255,.8), 0 0 20px rgba(174,92,255,.55), 3px 3px 0 rgba(9,12,28,.95) !important;
-  background:linear-gradient(135deg,rgba(31,39,82,.98),rgba(83,35,108,.92),rgba(20,30,70,.98)) !important;
-  border:2px solid rgba(92,220,255,.75) !important;
-  border-radius:16px !important;
-  box-shadow:0 0 0 3px rgba(174,92,255,.16),0 0 24px rgba(92,220,255,.28),inset 0 1px rgba(255,255,255,.18) !important;
-}
-.brand-title::before,.brand-title::after{
-  content:'✦';
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  color:#5cdcff;
-  font-size:.65em;
-  text-shadow:0 0 10px #5cdcff;
-}
-.brand-title::before{left:8px}.brand-title::after{right:8px;color:#d56cff;text-shadow:0 0 10px #d56cff}
-@media(max-width:600px){.brand-title{padding:12px 24px!important;font-size:1.2rem!important}}
-</style>
+    <link rel="manifest"
+          href="manifest.json">
+
 </head>
+
 <body>
 
+<!-- ============================ -->
+<!-- PRELOADER -->
+<!-- ============================ -->
 
+<div id="loader">
 
-<main>
+    <div class="loader-box">
 
-    <section id="welcomeCard" class="welcome-card">
-      <div class="welcome-kicker">⚡ PAIPLY PRESENTA</div>
-      <h2>¡Bienvenido a tu asistente de Brawl Stars!</h2>
-      <p>Prepara tu draft, elige tus brawlers y descubre mejores opciones de counters y sinergias.</p>
-      <div class="welcome-tip">🎮 Elige el formato → selecciona modo y mapa → arma tu equipo → analiza el draft.</div>
-    </section>
+        <img
+            src="assets/images/logo.png"
+            alt="Paiply Logo"
+            class="loader-logo">
 
-<div id="stepsbar">
-  <div class="active"><b>1</b> FORMATO</div>
-  <div><b>2</b> MODO Y MAPA</div>
-  <div><b>3</b> EQUIPOS</div>
-  <div><b>4</b> ANALIZAR</div>
-</div>
+        <h1>
 
-<section class="card hero"><div class="section-head"><div><div class="eyebrow" id="eyebrow">ASISTENTE DE DRAFT</div><h2 id="titleDraft">🎮 Analizar draft</h2></div></div><p class="muted" id="intro">Elige el formato, modo y mapa. Después arma tu equipo y selecciona a los rivales.</p>
+            PAIPLY
 
-<h3 class="step"><span>1</span><b id="stepFormat">Formato de partida</b></h3>
-<div class="format-grid">
-  <button type="button" class="format-btn active" data-format="3" onclick="setFormat(3)">👥 3 vs 3</button>
-  <button type="button" class="format-btn" data-format="2" onclick="setFormat(2)">👥 2 vs 2</button>
-  <button type="button" class="format-btn" data-format="1" onclick="setFormat(1)">🥊 1 vs 1</button>
-</div>
+        </h1>
 
-<h3 class="step"><span>2</span><b id="stepMatch">Configuración de partida</b></h3>
-<div class="grid">
-<label id="lblMode">Modo<select id="mode" onchange="modeChanged()"></select></label>
-<label id="lblMap">Mapa<select id="map"></select><span id="mapInfo" class="map-info"></span></label>
-<label id="lblOrder">Orden<select id="order"><option value="first">Primera elección</option><option value="second">Segunda elección</option><option value="last">Última elección</option></select></label>
-<label id="lblRole">Rol<select id="role"></select></label>
-</div>
+        <p>
 
-<h3 class="step"><span>3</span><b id="stepBans">Bans</b></h3><div class="bans"><div class="banbox"><span>BAN</span><select class="ban"></select></div><div class="banbox"><span>BAN</span><select class="ban"></select></div><div class="banbox"><span>BAN</span><select class="ban"></select></div></div>
+            Draft Pro
 
-<h3 class="step"><span>4</span><b id="stepTeam">Tu equipo</b> <span id="allyCount" class="small"></span></h3>
-<div id="allySlots" class="slot-grid"></div>
+        </p>
 
-<h3 class="step"><span>5</span><b id="stepEnemies">Rivales</b> <span id="enemyCount" class="small"></span></h3>
-<div id="enemySlots" class="slot-grid"></div>
+        <div class="loading-bar">
 
-<div class="actions">
-<button class="primary" onclick="analyze()" id="analyzeBtn">🏆 Analizar draft</button><button class="secondary" onclick="resetForm()" id="clearBtn">Limpiar</button>
-</div>
-</section>
+            <div class="loading-fill"></div>
 
+        </div>
 
-
-<section id="result" class="card hidden"><h2 id="resultTitle">🏆 Recomendación</h2><div id="output"></div></section>
-
-<section class="card">
-<details><summary id="rosterSummary">📚 Ver brawlers y datos</summary>
-<p class="muted">Hay 107 Brawlers jugables en la base. Los datos no verificados se dejan editables en vez de inventarlos.</p>
-<div id="roster"></div>
-</details>
-</section>
-
-<section class="card">
-<details><summary id="adminSummary">⚙️ Administrar balance, gadgets y counters</summary>
-<p class="muted">Selecciona un Brawler y completa los campos. Puedes guardar localmente, exportar un JSON o importar un JSON actualizado.</p>
-<div class="admin">
-<label>Brawler<select id="adm" onchange="loadAdmin()"></select></label>
-<label>Vida<input id="health"></label><label>Daño<input id="damage"></label>
-<label>Clase<input id="cls"></label><label>Rareza<input id="rarity"></label>
-<label>Roles<input id="roles" placeholder="daño, control"></label>
-<label>Modos<input id="modes" placeholder="Balón Brawl, Atraco"></label>
-<label>Mapas<input id="maps" placeholder="Abierto, Mixto"></label>
-<label>Counters<input id="counters" placeholder="Brawler, Brawler"></label>
-<label>Amenazas<input id="threats" placeholder="Brawler, Brawler"></label>
-<label>Sinergias<input id="synergy" placeholder="Brawler, Brawler"></label>
-<label>Gadget 1<input id="g1"></label><label>Gadget 2<input id="g2"></label>
-<label>Habilidad estelar 1<input id="sp1"></label><label>Habilidad estelar 2<input id="sp2"></label>
-<label>Hipercarga<input id="hc"></label>
-<label class="full">Cambio de balance / nota<input id="balance"></label>
-</div>
-<div class="actions">
-<button onclick="saveAdmin()">💾 Guardar</button>
-<button class="secondary" onclick="exportJSON()">📤 Exportar datos</button>
-<label class="file">📥 Importar datos<input type="file" accept=".json" onchange="importJSON(this.files[0])"></label>
-<button class="danger" onclick="restore()">↩️ Restaurar base</button>
-</div>
-<p id="status" class="muted"></p>
-</details>
-</section>
-</main>
-<footer id="footer"></footer>
-
-<script>
-const BASE={"version":"2026.10 · base ampliada","lastUpdate":"2026-10-04","rosterVerifiedDate":"2026-09-29","brawlerCount":107,"note":"Roster de 107 jugables según fuente de listado actualizada al 29/09/2026. Los campos de estadísticas, gadgets, habilidades estelares, hipercargas, counters y sinergias quedan editables y no se inventan si no están verificados.","modes":["Balón Brawl","Atrapagemas","Zona restringida","Atraco","Noqueo","Caza estelar","Supervivencia","Duelos","Paint Brawl","Payload","Cazadores","Esconderse y buscar"],"maps":["Abierto","Mixto","Cerrado"],"roles":["Daño","Control","Tanque","Asesino","Apoyo","Tirador","Artillería"],"brawlers":{"Paiply":{"class":"Daño","rarity":"Super Rara","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Carl":{"class":"Daño","rarity":"Super Rara","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Chester":{"class":"Daño","rarity":"Legendaria","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Clancy":{"class":"Daño","rarity":"Mítica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Cambio: velocidad de recarga del ataque 2000→1800; fichas fase 2: 6→5; fase 3: 21→24."},"Colette":{"class":"Daño","rarity":"Épica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: ratio de carga del Súper +10%."},"Colt":{"class":"Daño","rarity":"Rara","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Eve":{"class":"Daño","rarity":"Mítica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: crías del Súper 3→4; carga del Súper +17%."},"Lola":{"class":"Daño","rarity":"Épica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: velocidad del Ego ahora coincide con Lola."},"Lumi":{"class":"Daño","rarity":"Mítica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Mina":{"class":"Daño","rarity":"Mítica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Moe":{"class":"Daño","rarity":"Mítica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Najia":{"class":"Daño","rarity":"Mítica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Nita":{"class":"Daño","rarity":"Rara","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Pearl":{"class":"Daño","rarity":"Épica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"R-T":{"class":"Daño","rarity":"Mítica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: resistencia al daño de Grabación 20%→25%."},"Rico":{"class":"Daño","rarity":"Super Rara","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Shelly":{"class":"Daño","rarity":"Inicial","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Spike":{"class":"Daño","rarity":"Legendaria","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Surge":{"class":"Daño","rarity":"Legendaria","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Tara":{"class":"Daño","rarity":"Mítica","health":"","damage":"","roles":["Daño"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: Portal oscuro 3400→4000 vida y 800→1000 daño; Sombra curativa 3000→4000 vida y curación 400→600."},"Ash":{"class":"Tanque","rarity":"Épica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Bibi":{"class":"Tanque","rarity":"Épica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Bolt":{"class":"Tanque","rarity":"Épica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Bull":{"class":"Tanque","rarity":"Rara","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Buster":{"class":"Tanque","rarity":"Mítica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: curación de Cinturón de herramientas 450→600; daño adicional de Taquillazo 15%→20%."},"Damian":{"class":"Tanque","rarity":"Mítica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Darryl":{"class":"Tanque","rarity":"Super Rara","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Draco":{"class":"Tanque","rarity":"Legendaria","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"El Primo":{"class":"Tanque","rarity":"Rara","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Nerf: Cinturón de asteroides 16→20 s; carga de Súper por proyectiles -50%; Meteor Rush 4→3 s y escudo 20%→15%."},"Frank":{"class":"Tanque","rarity":"Épica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Hank":{"class":"Tanque","rarity":"Épica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: salud 5200→5500."},"Jacky":{"class":"Tanque","rarity":"Super Rara","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: escudo de Casco blindado 20%→25%."},"Meg":{"class":"Tanque","rarity":"Legendaria","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Ollie":{"class":"Tanque","rarity":"Mítica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Rosa":{"class":"Tanque","rarity":"Rara","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Trunk":{"class":"Tanque","rarity":"Épica","health":"","damage":"","roles":["Tanque"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Angelo":{"class":"Tirador","rarity":"Épica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Bea":{"class":"Tirador","rarity":"Épica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: Colmena agitada 24→20 s; daño del Súper 100→130."},"Belle":{"class":"Tirador","rarity":"Épica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: daño de ataque principal 1040→1140."},"Bonnie":{"class":"Tirador","rarity":"Épica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Brock":{"class":"Tirador","rarity":"Rara","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Janet":{"class":"Tirador","rarity":"Mítica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: daño de ataque principal 1000→1100."},"Maisie":{"class":"Tirador","rarity":"Épica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: velocidad de proyectil 3000→3200."},"Mandy":{"class":"Tirador","rarity":"Épica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Nani":{"class":"Tirador","rarity":"Épica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Pierce":{"class":"Tirador","rarity":"Legendaria","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Piper":{"class":"Tirador","rarity":"Épica","health":"","damage":"","roles":["Tirador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Barley":{"class":"Artillería","rarity":"Rara","health":"","damage":"","roles":["Artillería"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Dynamike":{"class":"Artillería","rarity":"Super Rara","health":"","damage":"","roles":["Artillería"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: daño de Giros explosivos 1200→1400."},"Grom":{"class":"Artillería","rarity":"Épica","health":"","damage":"","roles":["Artillería"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Juju":{"class":"Artillería","rarity":"Mítica","health":"","damage":"","roles":["Artillería"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Larry & Lawrie":{"class":"Artillería","rarity":"Épica","health":"","damage":"","roles":["Artillería"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Sprout":{"class":"Artillería","rarity":"Mítica","health":"","damage":"","roles":["Artillería"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Tick":{"class":"Artillería","rarity":"Super Rara","health":"","damage":"","roles":["Artillería"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Amber":{"class":"Controlador","rarity":"Legendaria","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Nerf: Fire Starters 1750→1300 de vida; Wild Flames 3→1 s; buffie de hipercarga 500→240 de daño."},"Bo":{"class":"Controlador","rarity":"Épica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: daño de ataque principal 640→700."},"Charlie":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Chuck":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Cosmo":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Emz":{"class":"Controlador","rarity":"Épica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Finx":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Gale":{"class":"Controlador","rarity":"Épica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Gene":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Griff":{"class":"Controlador","rarity":"Épica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Jessie":{"class":"Controlador","rarity":"Super Rara","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: daño del Súper 260→300."},"Lou":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Meeple":{"class":"Controlador","rarity":"Épica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Mr. P":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Otis":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Penny":{"class":"Controlador","rarity":"Super Rara","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Sandy":{"class":"Controlador","rarity":"Legendaria","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Sirius":{"class":"Controlador","rarity":"Ultra Legendaria","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Squeak":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Willow":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Ziggy":{"class":"Controlador","rarity":"Mítica","health":"","damage":"","roles":["Controlador"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: ratio de carga del Súper +6%."},"Alli":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Buzz":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Cordelius":{"class":"Asesino","rarity":"Legendaria","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Crow":{"class":"Asesino","rarity":"Legendaria","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Edgar":{"class":"Asesino","rarity":"Épica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Fang":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Gigi":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Kaze":{"class":"Asesino","rarity":"Ultra Legendaria","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Kenji":{"class":"Asesino","rarity":"Legendaria","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Leon":{"class":"Asesino","rarity":"Legendaria","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: clones de Proyector clonador alcance 5→25 y daño 200→800; velocidad de clones coincide con Leon."},"Lily":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Melodie":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: salud 3800→4000; Entonación perfecta 14→10 s; velocidad 25%→35%; alcance 60%→70%."},"Mico":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Mortis":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Nori":{"class":"Asesino","rarity":"Legendaria","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Sam":{"class":"Asesino","rarity":"Épica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Shade":{"class":"Asesino","rarity":"Épica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Nerf: carga del Súper cerca de enemigos -15%; gadget Brazos largos 18→20 s; gadget Aparición abrumadora radio 1000→600; buffie de hipercarga 75%→30%."},"Starr Nova":{"class":"Asesino","rarity":"Mítica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Stu":{"class":"Asesino","rarity":"Épica","health":"","damage":"","roles":["Asesino"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Berry":{"class":"Apoyo","rarity":"Épica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Byron":{"class":"Apoyo","rarity":"Mítica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Doug":{"class":"Apoyo","rarity":"Mítica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Glowy":{"class":"Apoyo","rarity":"Mítica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Gray":{"class":"Apoyo","rarity":"Mítica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Gus":{"class":"Apoyo","rarity":"Super Rara","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Nerf: gadget Empujón espiritual a 18 s; Salud abundante reduce su aumento de curación 100%→75%."},"Jae-yong":{"class":"Apoyo","rarity":"Mítica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: curación de ataque 650→750; velocidad de Público entregado 10%→15%."},"Kit":{"class":"Apoyo","rarity":"Legendaria","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Max":{"class":"Apoyo","rarity":"Mítica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Pam":{"class":"Apoyo","rarity":"Épica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":"Buff: salud de torreta 3040→3300; curación del Súper 500→600; torreta de hipercarga 4200→4500."},"Poco":{"class":"Apoyo","rarity":"Rara","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Ruffs":{"class":"Apoyo","rarity":"Mítica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""},"Wendy":{"class":"Apoyo","rarity":"Mítica","health":"","damage":"","roles":["Apoyo"],"modes":[],"maps":[],"counters":[],"threats":[],"synergies":[],"gadget1":"","gadget2":"","starPower1":"","starPower2":"","hypercharge":"","balanceNote":""}}};
-let D=JSON.parse(localStorage.getItem("BS_DRAFT_DATA")||"null")||structuredClone(BASE);
-const $=id=>document.getElementById(id);
-const I18N={es:{subtitle:"ANALIZA · PLANIFICA · GANA",eyebrow:"ASISTENTE DE DRAFT",title:"🎮 Analizar draft",intro:"Elige el formato, modo y mapa. Después arma tu equipo y selecciona a los rivales.",format:"Formato de partida",match:"Configuración de partida",mode:"Modo",map:"Mapa",order:"Orden",role:"Rol",first:"Primera elección",second:"Segunda elección",last:"Última elección",bans:"Bans",team:"Tu equipo",enemies:"Rivales",analyze:"🏆 Analizar draft",clear:"Limpiar",recommend:"🏆 Recomendación",roster:"📚 Ver brawlers y datos",admin:"⚙️ Administrar balance, gadgets y counters",player:"Jugador",rival:"Rival",none:"— Ninguno —",loading:"Cargando mapas…",saved:"Guardado en este navegador."},en:{subtitle:"Draft · Counters · Synergies · Maps assistant",eyebrow:"DRAFT ASSISTANT",title:"🎮 Analyze draft",intro:"Choose the format, mode and map. Then build your team and select the opponents.",format:"Match format",match:"Match settings",mode:"Mode",map:"Map",order:"Pick order",role:"Role",first:"First pick",second:"Second pick",last:"Last pick",bans:"Bans",team:"Your team",enemies:"Opponents",analyze:"🏆 Analyze draft",clear:"Clear",recommend:"🏆 Recommendation",roster:"📚 View brawlers & data",admin:"⚙️ Manage balance, gadgets & counters",player:"Player",rival:"Opponent",none:"— None —",loading:"Loading maps…",saved:"Saved in this browser."}};
-let LANG="es";
-function setLanguage(lang){LANG=lang;localStorage.setItem("BS_LANG",lang);const t=I18N[lang];$("subtitle").textContent=t.subtitle;$("eyebrow").textContent=t.eyebrow;$("titleDraft").textContent=t.title;$("intro").textContent=t.intro;$("stepFormat").textContent=t.format;$("stepMatch").textContent=t.match;$("stepBans").textContent=t.bans;$("stepTeam").textContent=t.team;$("stepEnemies").textContent=t.enemies;$("lblMode").childNodes[0].textContent=t.mode;$("lblMap").childNodes[0].textContent=t.map;$("lblOrder").childNodes[0].textContent=t.order;$("lblRole").childNodes[0].textContent=t.role;$("analyzeBtn").textContent=t.analyze;$("clearBtn").textContent=t.clear;$("resultTitle").textContent=t.recommend;$("rosterSummary").textContent=t.roster;$("adminSummary").textContent=t.admin;$("order").options[0].textContent=t.first;$("order").options[1].textContent=t.second;$("order").options[2].textContent=t.last;setFormat(draftSize);render();}
-
-const names=()=>Object.keys(D.brawlers).sort();
-const arr=s=>$(s).value.split(",").map(x=>x.trim()).filter(Boolean);
-let draftSize=3;
-let allMaps=[];
-let mapsReady=false;
-
-const MODE_ALIASES={
-  "Balón Brawl":"Brawl Ball","Atrapagemas":"Gem Grab","Zona restringida":"Hot Zone",
-  "Atraco":"Heist","Noqueo":"Knockout","Caza estelar":"Bounty","Supervivencia":"Solo Showdown",
-  "Duelos":"Duels","Paint Brawl":"Paint Brawl","Payload":"Payload","Cazadores":"Hunters",
-  "Esconderse y buscar":"Hide & Seek","Brawl Hockey":"Brawl Hockey","Arena":"Brawl Arena",
-  "Destrucción":"Wipeout","Caza del tesoro":"Treasure Hunt","Descartafichas":"Token Run",
-  "Quemabrawl":"DodgeBrawl","Coleccionista de almas":"Soul Collector",
-  "Robo de regalos":"Present Plunder","Atraco explosivo":"Safe Blast",
-  "Contienda sombría":"Shadow Smash","Contienda espiritual":"Spirit Wars",
-  "Subway Run":"Subway Run","Megajefe (Dúo)":"Duo Mega Boss",
-  "Todos contra uno":"Boss Fight","Swarm":"Swarm"
-};
-
-function pretty(s){return s.replaceAll("-"," ").replace(/\b\w/g,c=>c.toUpperCase())}
-function fill(el,items,none=true){
-  el.innerHTML=none?`<option value="">${I18N[LANG].none}</option>`:"";
-  items.forEach(x=>{let o=document.createElement("option");o.value=x;o.textContent=x;el.appendChild(o)})
-}
-function selected(q){return [...document.querySelectorAll(q)].map(x=>x.value).filter(Boolean)}
-
-function setFormat(size){
-  draftSize=size;
-  document.querySelectorAll(".format-btn").forEach(b=>b.classList.toggle("active",Number(b.dataset.format)===size));
-  $("allyCount").textContent=`(${size} ${size===1?"jugador":"jugadores"})`;
-  $("enemyCount").textContent=`(${size} ${size===1?"rival":"rivales"})`;
-  renderSlots("allySlots","ally",size);
-  renderSlots("enemySlots","enemy",size);
-}
-function renderSlots(containerId, cls, count){
-  const box=$(containerId);
-  box.innerHTML="";
-  for(let i=1;i<=count;i++){
-    const label=document.createElement("label");
-    label.innerHTML=`${cls==="ally"?I18N[LANG].player:I18N[LANG].rival} ${i}`;
-    const select=document.createElement("select");
-    select.className=cls;
-    box.appendChild(label);
-    label.appendChild(select);
-    fill(select,names());
-  }
-}
-
-async function loadMaps(){
-  try{
-    $("mapInfo").textContent="Cargando catálogo de mapas…";
-    const r=await fetch("https://api.brawlapi.com/v1/maps");
-    if(!r.ok)throw new Error("No se pudo cargar el catálogo");
-    const data=await r.json();
-    allMaps=(data.list||[]).filter(m=>m&&m.name&&m.gameMode);
-    mapsReady=true;
-    updateMaps();
-  }catch(e){
-    mapsReady=false;
-    $("mapInfo").textContent="No se pudo cargar el catálogo en línea. Puedes usar los datos locales.";
-    updateMaps();
-  }
-}
-
-function updateMaps(){
-  const mode=$("mode").value;
-  const apiName=MODE_ALIASES[mode]||mode;
-  let maps=allMaps.filter(m=>{
-    const gm=m.gameMode?.name||"";
-    return gm===apiName || gm.toLowerCase()===apiName.toLowerCase();
-  });
-
-  // Show active maps first, then disabled/archived maps.
-  maps.sort((a,b)=>Number(!!a.disabled)-Number(!!b.disabled) || a.name.localeCompare(b.name));
-  const namesList=[...new Set(maps.map(m=>aMapLabel(m)))];
-
-  fill($("map"),namesList,false);
-  if(namesList.length){
-    $("mapInfo").textContent=`${namesList.length} mapa${namesList.length===1?"":"s"} encontrados para ${mode}.`;
-  }else{
-    // Keep the three broad local categories only as a fallback.
-    fill($("map"),["Abierto","Mixto","Cerrado"],false);
-    $("mapInfo").textContent=mapsReady
-      ? "Este modo todavía no tiene mapas registrados en el catálogo."
-      : "Mapas locales de respaldo.";
-  }
-}
-function aMapLabel(m){return m.disabled ? `${m.name} · Archivo` : m.name}
-function modeChanged(){updateMaps()}
-
-function render(){
-  fill($("mode"),D.modes,false);
-  fill($("role"),D.roles,false);
-  document.querySelectorAll(".ban").forEach(x=>fill(x,names()));
-  fill($("adm"),names(),false);
-  setFormat(draftSize);
-  $("footer").textContent=`Base: ${D.brawlerCount} Brawlers · Datos: ${D.version} · Actualizado: ${D.lastUpdate}`;
-  loadAdmin();renderRoster();loadMaps();
-}
-
-function renderRoster(){
-  let by={};
-  for(let [n,b] of Object.entries(D.brawlers))(by[b.class]??=[]).push(n);
-  $("roster").innerHTML=Object.entries(by).map(([c,ns])=>`<h3>${c} (${ns.length})</h3>${ns.sort().map(n=>`<span class="tag">${n}</span>`).join("")}`).join("");
-}
-
-function analyze(){
-  let bans=selected(".ban"),ally=selected(".ally"),enemy=selected(".enemy");
-  let mode=$("mode").value,map=$("map").value,role=$("role").value;
-
-  let list=Object.entries(D.brawlers)
-    .filter(([n])=>![...bans,...ally,...enemy].includes(n))
-    .map(([n,b])=>{
-      let s=50,r=[];
-      if(role && (b.roles||[]).includes(role)){s+=15;r.push("cumple el rol")}
-      if((b.modes||[]).includes(mode)){s+=10;r.push("encaja con el modo")}
-      if((b.maps||[]).includes(map)){s+=10;r.push("encaja con el mapa")}
-
-      enemy.forEach(e=>{
-        if((b.counters||[]).includes(e)){s+=14;r.push("counter de "+e)}
-        if((D.brawlers[e]?.counters||[]).includes(n)){s-=14}
-      });
-      ally.forEach(a=>{
-        if((b.synergies||[]).includes(a)){s+=8;r.push("sinergia con "+a)}
-      });
-      if(b.balanceNote)r.push("tiene información de balance registrada");
-      return {n,s,r};
-    }).sort((a,b)=>b.s-a.s);
-
-  $("result").classList.remove("hidden");
-  if(!list.length){$("output").innerHTML="<p>No hay candidatos disponibles.</p>";return}
-
-  let best=list[0],alt=list.slice(1,6),b=D.brawlers[best.n];
-  const teamText=ally.length?ally.join(", "):"sin compañeros seleccionados";
-  const enemyText=enemy.length?enemy.join(", "):"sin rivales seleccionados";
-
-  $("output").innerHTML=`
-    <div class="rec">
-      <h3>${best.n}</h3>
-      <div class="score">${Math.round(best.s)}/100</div>
-      <p><b>Formato:</b> ${draftSize} vs ${draftSize}</p>
-      <p><b>Mapa:</b> ${map||"no seleccionado"} · <b>Modo:</b> ${mode}</p>
-      <p><b>Tu equipo:</b> ${teamText}</p>
-      <p><b>Rivales:</b> ${enemyText}</p>
-      <p><b>Razón:</b> ${best.r.join(", ")||"opción equilibrada con los datos disponibles"}.</p>
-      <p><b>Clase:</b> ${b.class} · <b>Rareza:</b> ${b.rarity}</p>
-      ${b.balanceNote?`<p><b>Balance registrado:</b> ${b.balanceNote}</p>`:""}
-      <p class="small">La puntuación depende de los datos que hayas introducido. Es una recomendación del asistente, no una garantía de victoria.</p>
     </div>
-    <h3>Alternativas</h3>
-    <div class="rank">${alt.map(x=>`<div><span>${x.n}</span><b>${Math.round(x.s)}/100</b></div>`).join("")}</div>`;
-}
 
-function resetForm(){location.reload()}
-
-function loadAdmin(){
-  let n=$("adm").value,b=D.brawlers[n];if(!b)return;
-  $("health").value=b.health||"";$("damage").value=b.damage||"";$("cls").value=b.class||"";$("rarity").value=b.rarity||"";
-  $("roles").value=(b.roles||[]).join(", ");$("modes").value=(b.modes||[]).join(", ");$("maps").value=(b.maps||[]).join(", ");
-  $("counters").value=(b.counters||[]).join(", ");$("threats").value=(b.threats||[]).join(", ");$("synergy").value=(b.synergies||[]).join(", ");
-  $("g1").value=b.gadget1||"";$("g2").value=b.gadget2||"";$("sp1").value=b.starPower1||"";$("sp2").value=b.starPower2||"";$("hc").value=b.hypercharge||"";$("balance").value=b.balanceNote||"";
-}
-function saveAdmin(){
-  let n=$("adm").value,b=D.brawlers[n];b.health=$("health").value;b.damage=$("damage").value;b.class=$("cls").value.trim();b.rarity=$("rarity").value.trim();
-  b.roles=arr("roles");b.modes=arr("modes");b.maps=arr("maps");b.counters=arr("counters");b.threats=arr("threats");b.synergies=arr("synergy");
-  b.gadget1=$("g1").value.trim();b.gadget2=$("g2").value.trim();b.starPower1=$("sp1").value.trim();b.starPower2=$("sp2").value.trim();b.hypercharge=$("hc").value.trim();b.balanceNote=$("balance").value.trim();
-  D.lastUpdate=new Date().toISOString().slice(0,10);localStorage.setItem("BS_DRAFT_DATA",JSON.stringify(D));render();$("adm").value=n;loadAdmin();$("status").textContent="Guardado en este navegador.";
-}
-function exportJSON(){
-  let blob=new Blob([JSON.stringify(D,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
-  a.href=url;a.download="brawl-draft-datos.json";a.click();URL.revokeObjectURL(url);$("status").textContent="JSON exportado.";
-}
-function importJSON(file){
-  if(!file)return;let r=new FileReader();
-  r.onload=e=>{try{let x=JSON.parse(e.target.result);if(!x.brawlers)throw Error("JSON inválido");D=x;localStorage.setItem("BS_DRAFT_DATA",JSON.stringify(D));render();$("status").textContent="Datos importados correctamente."}catch(err){$("status").textContent="Error: "+err.message}};
-  r.readAsText(file);
-}
-function restore(){
-  if(confirm("¿Restaurar la base inicial?")){D=structuredClone(BASE);localStorage.removeItem("BS_DRAFT_DATA");render();$("status").textContent="Base restaurada."}
-}
-LANG=localStorage.getItem("BS_LANG")||"es";$("language").value=LANG;render();setLanguage(LANG);
-
-
-
-</script>
-<div id="floatingBit" role="button" tabindex="0" aria-label="Paiply flotante. Arrástrame o tócame para escuchar una frase." title="Arrástrame o tócame">
-  <div class="bit-orb" aria-hidden="true">
-    <svg viewBox="0 0 64 64" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
-      <rect x="20" y="3" width="24" height="5" fill="#00d9ff"/>
-      <rect x="12" y="8" width="40" height="5" fill="#00b8f0"/>
-      <rect x="7" y="13" width="50" height="8" fill="#1688ff"/>
-      <rect x="4" y="21" width="56" height="26" fill="#2a4fa0"/>
-      <rect x="8" y="18" width="48" height="30" fill="#3b67bd"/>
-      <rect x="12" y="23" width="14" height="15" fill="#00eaff"/>
-      <rect x="38" y="23" width="14" height="15" fill="#00eaff"/>
-      <rect x="15" y="26" width="8" height="9" fill="#eaffff"/>
-      <rect x="41" y="26" width="8" height="9" fill="#eaffff"/>
-      <rect x="26" y="40" width="12" height="4" fill="#09152e"/>
-      <rect x="18" y="48" width="28" height="5" fill="#00b8f0"/>
-      <rect x="23" y="53" width="18" height="5" fill="#1688ff"/>
-      <rect x="28" y="58" width="8" height="3" fill="#00d9ff"/>
-      <rect x="0" y="24" width="5" height="16" fill="#7b3cff"/>
-      <rect x="59" y="24" width="5" height="16" fill="#7b3cff"/>
-      <rect x="13" y="14" width="6" height="3" fill="#a9fbff"/>
-      <rect x="45" y="14" width="6" height="3" fill="#a9fbff"/>
-      <rect x="6" y="49" width="6" height="4" fill="#ff315c"/>
-      <rect x="52" y="49" width="6" height="4" fill="#ffd52a"/>
-    </svg>
-  </div>
-  <div class="bit-speech" id="floatingBitSpeech" aria-live="polite">
-    <strong>Paiply DICE:</strong><span id="floatingBitLine">¡Inserta una moneda y vamos!</span>
-  </div>
 </div>
-<script>
-(function(){
-  const bot = document.getElementById("floatingBit");
-  const line = document.getElementById("floatingBitLine");
-  if(!bot || !line) return;
 
-  const linesES = [
-    ["JA, JA. ¡NOOB!", "¿Ese era tu mejor pick o se te cayó el celular? 😂"],
-    ["MODO TROLL ACTIVADO", "Tu rival está jugando… pero tú estás regalando la partida. 💀"],
-    ["ERROR 404: SKILL", "No se encontró habilidad en este jugador."],
-    ["¿QUÉ DRAFT ES ESE?", "Hasta el botón de aleatorio tenía mejores ideas."],
-    ["PICK SOSPECHOSO", "Ese brawler acaba de pedir vacaciones."],
-    ["ALERTA DE BOT", "Movimiento detectado: correr solo contra 3 enemigos."],
-    ["MODO PAYASO", "Excelente estrategia… si tu objetivo era perder."],
-    ["COUNTER DETECTADO", "Elegiste exactamente lo que el rival quería. 😂"],
-    ["¡NOOO, BRO!", "Acabas de convertir un buen draft en una película de terror."],
-    ["RIVAL CONFUNDIDO", "Hasta el rival se pregunta qué estás haciendo."],
-    ["¿DÓNDE APUNTAS?", "La pared recibió más daño que el enemigo."],
-    ["PUNTERÍA PREMIUM", "Cero enemigos golpeados. Rendimiento impecable."],
-    ["CAMPEÓN DEL BUSH", "El arbusto te conoce mejor que tus compañeros."],
-    ["SE BUSCA", "Tu brawler desapareció justo cuando empezó la pelea."],
-    ["¿PLAN DE JUEGO?", "Sí: improvisar y esperar un milagro."],
-    ["ESTRATEGIA SECRETA", "Tan secreta que ni tú sabes cuál es."],
-    ["BRO, REACCIONA", "El enemigo ya hizo el movimiento y tú sigues pensando."],
-    ["DRAFT CRIMINAL", "Ese pick debería venir con una advertencia."],
-    ["MALA IDEA", "Pero tranquila, todavía puedes empeorarla."],
-    ["NIVEL DE CONFIANZA", "100%. Nivel de acierto: seguimos investigando."],
-    ["¡QUÉ MANOS!", "Tus dedos están jugando una partida diferente."],
-    ["MODO ESPECTADOR", "Porque parece que estás viendo jugar a los demás."],
-    ["GPS ACTIVADO", "Tu brawler está buscando el objetivo correcto."],
-    ["OBJETIVO EQUIVOCADO", "La pared no era el enemigo, campeón."],
-    ["DAÑO PSICOLÓGICO", "Tu draft acaba de hacer llorar al matchmaking."],
-    ["NO HAY PLAN B", "Tampoco encontramos el plan A."],
-    ["¡CORRE!", "No es cobardía si estratégicamente huyes… ¿no?"],
-    ["TODO CALCULADO", "Calculaste absolutamente nada. 😂"],
-    ["PROFESIONAL DEL ERROR", "Otra jugada perfecta… para el enemigo."],
-    ["TROLL SUPREMO", "Si esto gana, será por accidente."],
-    ["REPORTE DEL SISTEMA", "Skill: dudosa. Confianza: inexplicablemente alta."],
-    ["¡INSERTA CEREBRO!", "Monedas ya no hacen falta. 😎"],
-    ["MODO SUFRIMIENTO", "Tu equipo acaba de desbloquear una dificultad nueva."],
-    ["EL MATCHMAKING TE ODIA", "O quizá solo está probando tu paciencia."],
-    ["¿QUIÉN ELIGIÓ ESO?", "Ah… fuiste tú. Entendido."],
-    ["PICK LEGENDARIO", "Legendario por lo mala que fue la idea."],
-    ["NO TE MUEVAS", "Mentira. Muévete antes de que te encuentren."],
-    ["ULTIMATE DEL RIVAL", "Y tú todavía estás buscando cobertura."],
-    ["COMBO PERFECTO", "Tú fallas, el rival anota y todos felices… menos tú."],
-    ["¡CLUTCH IMAGINARIO!", "En tu mente acabas de ganar el mundial."],
-    ["MVP DEL RIVAL", "Gracias por colaborar con su victoria."],
-    ["ASISTENCIA PERFECTA", "Le diste al enemigo exactamente lo que necesitaba."],
-    ["PLAN MAESTRO", "Fase 1: elegir. Fase 2: arrepentirse."],
-    ["NO TE JUZGO", "Bueno… quizá un poquito. 😂"],
-    ["DEMOSTRACIÓN GRATUITA", "Así se enseña al rival cómo ganar."],
-    ["TÚ PUEDES", "Pero el enemigo también puede… y está jugando mejor."],
-    ["FE ANTE TODO", "Porque estrategia ya no queda."],
-    ["MODO MILAGRO", "Activa tu habilidad especial: rezar."],
-    ["¡CAMBIO DE BRAWLER!", "O quédate. Me encanta el caos."],
-    ["PARTIDA CINEMATOGRÁFICA", "Lástima que tú eres el personaje secundario."],
-    ["NIVEL DE TROLL", "Demasiado alto para el matchmaking."],
-    ["JAJA, QUÉ PICK", "No lo entiendo, pero respeto la confianza."],
-    ["EL RIVAL AGRADECE", "Tu elección fue muy considerada."],
-    ["ALERTA ROJA", "Ese draft necesita supervisión adulta."],
-    ["CUIDADO", "Se detectó una decisión cuestionable."],
-    ["SISTEMA CONFIRMADO", "Sí, efectivamente elegiste ese brawler."],
-    ["NO HAY VUELTA ATRÁS", "El botón de confirmar fue demasiado rápido."],
-    ["MOMENTO HISTÓRICO", "Acabas de sorprender incluso a tu propio equipo."],
-    ["¿ESTÁS SEGURO?", "Pregunta retórica. Ya lo elegiste."],
-    ["SUERTE", "La vas a necesitar. Muchísima."],
-  ];
-  const linesEN = [
-    ["HA, HA. NOOB!", "Was that your best pick or did you drop your phone? 😂"],
-    ["TROLL MODE ON", "Your enemy is playing… but you're donating the match. 💀"],
-    ["ERROR 404: SKILL", "No skill was found on this player."],
-    ["WHAT IS THAT DRAFT?", "Even random selection had better ideas."],
-    ["SUS PICK", "That brawler just asked for a vacation."],
-    ["BOT ALERT", "Movement detected: running alone into three enemies."],
-    ["CLOWN MODE", "Great strategy… if your goal was to lose."],
-    ["COUNTER DETECTED", "You picked exactly what the enemy wanted. 😂"],
-    ["NOOO, BRO!", "You just turned a good draft into a horror movie."],
-    ["ENEMY CONFUSED", "Even the enemy is wondering what you're doing."],
-    ["WHERE ARE YOU AIMING?", "The wall took more damage than the enemy."],
-    ["PREMIUM AIM", "Zero enemies hit. Impressive performance."],
-    ["BUSH CHAMPION", "The bush knows you better than your teammates."],
-    ["MISSING PLAYER", "Your brawler disappeared right when the fight started."],
-    ["GAME PLAN?", "Yes: improvise and pray for a miracle."],
-    ["SECRET STRATEGY", "So secret even you don't know it."],
-    ["BRO, REACT!", "The enemy already moved and you're still thinking."],
-    ["CRIMINAL DRAFT", "That pick should come with a warning."],
-    ["BAD IDEA", "Don't worry, you can still make it worse."],
-    ["CONFIDENCE LEVEL", "100%. Accuracy level: under investigation."],
-    ["WHAT HANDS!", "Your fingers are playing a different match."],
-    ["SPECTATOR MODE", "Because it looks like you're watching everyone else play."],
-    ["GPS ACTIVATED", "Your brawler is looking for the correct target."],
-    ["WRONG TARGET", "The wall wasn't the enemy, champion."],
-    ["PSYCHOLOGICAL DAMAGE", "Your draft just made matchmaking cry."],
-    ["NO PLAN B", "We couldn't find plan A either."],
-    ["RUN!", "It's not cowardice if it's strategic… right?"],
-    ["TOTALLY CALCULATED", "You calculated absolutely nothing. 😂"],
-    ["ERROR PROFESSIONAL", "Another perfect play… for the enemy."],
-    ["ULTIMATE TROLL", "If this wins, it'll be by accident."],
-    ["SYSTEM REPORT", "Skill: questionable. Confidence: strangely high."],
-    ["INSERT BRAIN!", "No coins needed. 😎"],
-    ["SUFFERING MODE", "Your team just unlocked a new difficulty."],
-    ["MATCHMAKING HATES YOU", "Or maybe it's just testing your patience."],
-    ["WHO PICKED THAT?", "Oh… you did. Got it."],
-    ["LEGENDARY PICK", "Legendary because the idea was terrible."],
-    ["DON'T MOVE", "Just kidding. Move before they find you."],
-    ["ENEMY ULTIMATE", "And you're still looking for cover."],
-    ["PERFECT COMBO", "You miss, enemy scores, everyone wins… except you."],
-    ["IMAGINARY CLUTCH!", "In your head, you just won the world championship."],
-    ["ENEMY MVP", "Thanks for helping with their victory."],
-    ["PERFECT ASSIST", "You gave the enemy exactly what they needed."],
-    ["MASTER PLAN", "Phase 1: pick. Phase 2: regret."],
-    ["I'M NOT JUDGING", "Okay… maybe a little. 😂"],
-    ["FREE DEMO", "A live demonstration of how to help the enemy win."],
-    ["YOU CAN DO IT", "But the enemy can too… and they're playing better."],
-    ["FAITH FIRST", "Because strategy is apparently gone."],
-    ["MIRACLE MODE", "Activate your special ability: praying."],
-    ["SWITCH BRAWLER!", "Or don't. I love chaos."],
-    ["CINEMATIC MATCH", "Too bad you're the side character."],
-    ["TROLL LEVEL", "Too high for matchmaking."],
-    ["WHAT A PICK", "I don't understand it, but I respect the confidence."],
-    ["THE ENEMY THANKS YOU", "Your choice was very considerate."],
-    ["RED ALERT", "That draft needs adult supervision."],
-    ["CAUTION", "A questionable decision has been detected."],
-    ["SYSTEM CONFIRMED", "Yes, you really picked that brawler."],
-    ["NO TURNING BACK", "The confirm button was way too fast."],
-    ["HISTORIC MOMENT", "You just surprised even your own team."],
-    ["ARE YOU SURE?", "Rhetorical question. You already picked it."],
-    ["GOOD LUCK", "You're going to need it. A lot."],
-  ];
+<!-- ============================ -->
+<!-- FONDO -->
+<!-- ============================ -->
 
-  let last = -1, downX = 0, downY = 0, startLeft = 0, startTop = 0, moved = false;
-  function phrase(){
-    const lang = (typeof LANG !== "undefined" && LANG === "en") ? "en" : "es";
-    const list = lang === "en" ? linesEN : linesES;
-    let i = Math.floor(Math.random() * list.length);
-    if(list.length > 1 && i === last) i = (i + 1) % list.length;
-    last = i;
-    const item = list[i];
-    bot.querySelector(".bit-speech strong").textContent = "Paiply: " + item[0];
-    line.textContent = item[1];
-    bot.classList.add("show-message");
-    clearTimeout(bot._hideTimer);
-    bot._hideTimer = setTimeout(() => bot.classList.remove("show-message"), 4800);
-  }
-  bot.addEventListener("pointerdown", function(e){
-    if(e.button !== undefined && e.button !== 0) return;
-    const rect = bot.getBoundingClientRect();
-    downX = e.clientX; downY = e.clientY;
-    startLeft = rect.left; startTop = rect.top; moved = false;
-    bot.style.left = rect.left + "px";
-    bot.style.top = rect.top + "px";
-    bot.style.right = "auto"; bot.style.bottom = "auto";
-    bot.setPointerCapture(e.pointerId);
-  });
-  bot.addEventListener("pointermove", function(e){
-    if(!bot.hasPointerCapture(e.pointerId)) return;
-    const dx = e.clientX - downX, dy = e.clientY - downY;
-    if(Math.abs(dx) + Math.abs(dy) > 7){ moved = true; bot.classList.add("dragging"); }
-    if(!moved) return;
-    const maxX = window.innerWidth - bot.offsetWidth;
-    const maxY = window.innerHeight - bot.offsetHeight;
-    bot.style.left = Math.max(0, Math.min(maxX, startLeft + dx)) + "px";
-    bot.style.top = Math.max(0, Math.min(maxY, startTop + dy)) + "px";
-  });
-  function release(){
-    bot.classList.remove("dragging");
-    if(moved){
-      const rect = bot.getBoundingClientRect();
-      bot.style.left = Math.max(0, Math.min(window.innerWidth - bot.offsetWidth, rect.left)) + "px";
-      bot.style.top = Math.max(0, Math.min(window.innerHeight - bot.offsetHeight, rect.top)) + "px";
-    } else {
-      phrase();
-    }
-  }
-  bot.addEventListener("pointerup", release);
-  bot.addEventListener("pointercancel", release);
-  bot.addEventListener("keydown", e => {
-    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); phrase(); }
-  });
-  window.addEventListener("resize", () => {
-    const rect = bot.getBoundingClientRect();
-    bot.style.left = Math.max(0, Math.min(window.innerWidth - bot.offsetWidth, rect.left)) + "px";
-    bot.style.top = Math.max(0, Math.min(window.innerHeight - bot.offsetHeight, rect.top)) + "px";
-  });
-  setTimeout(phrase, 900);
-})();
-</script>
+<div id="background"></div>
 
+<div id="particles"></div>
 
-  <button id="settingsToggle" class="settings-toggle" type="button" aria-expanded="false" aria-controls="settingsPanel">⚙ AJUSTES</button>
-  <aside id="settingsPanel" class="settings-panel" aria-label="Ajustes" aria-hidden="true">
-    <div class="settings-head">
-      <div class="settings-title">⚙ AJUSTES</div>
-      <button id="settingsClose" class="settings-close" type="button" aria-label="Cerrar ajustes">✕</button>
+<!-- ============================ -->
+<!-- HEADER -->
+<!-- ============================ -->
+
+<header>
+
+<div class="logo">
+
+<img src="assets/images/logo.png">
+
+<h2>
+
+PAIPLY DRAFT PRO
+
+</h2>
+
+</div>
+
+<nav>
+
+<a href="#inicio">
+
+Inicio
+
+</a>
+
+<a href="#features">
+
+Funciones
+
+</a>
+
+<a href="#screenshots">
+
+Capturas
+
+</a>
+
+<a href="#download">
+
+Descargar
+
+</a>
+
+</nav>
+
+<button id="themeButton">
+
+🌙
+
+</button>
+
+</header>
+
+<!-- ============================ -->
+<!-- HERO -->
+<!-- ============================ -->
+
+<section
+id="inicio"
+class="hero">
+
+<div class="hero-left">
+
+<h1>
+
+La mejor aplicación para
+
+<span>
+
+Brawl Stars
+
+</span>
+
+</h1>
+
+<p>
+
+Analiza Drafts.
+
+Conoce el Meta.
+
+Consulta Estadísticas.
+
+Descubre Counters.
+
+Y mejora tus partidas.
+
+</p>
+
+<div class="hero-buttons">
+
+<button
+class="install">
+
+📲 Instalar App
+
+</button>
+
+<button
+class="discord">
+
+💬 Comunidad
+
+</button>
+
+</div>
+
+</div>
+
+<div class="hero-right">
+
+<img
+
+src="assets/images/paiply.png"
+
+id="paiply">
+
+</div>
+
+</section>
+
+<!-- ======================================= -->
+<!-- CARACTERÍSTICAS -->
+<!-- ======================================= -->
+
+<section id="features" class="features">
+
+    <div class="section-title">
+
+        <h2>¿Por qué elegir Paiply?</h2>
+
+        <p>Todo lo que necesitas para convertirte en un mejor jugador de Brawl Stars.</p>
+
     </div>
-    <label class="settings-row">
-      <span>Idioma</span>
-      <select id="sideLanguage">
-        <option value="es">Español</option>
-        <option value="en">English</option>
-      </select>
-    </label>
-    <label class="settings-row">
-      <span>Paiply</span>
-      <select id="paiplyMood">
-        <option value="troll">Troll</option>
-        <option value="motivador">Motivador</option>
-        <option value="mixto">Mixto</option>
-      </select>
-    </label>
-  </aside>
 
+    <div class="features-grid">
 
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-  const settingsToggle = document.getElementById("settingsToggle");
-  const settingsPanel = document.getElementById("settingsPanel");
-  const settingsClose = document.getElementById("settingsClose");
-  function setSettings(open){
-    if(!settingsPanel || !settingsToggle) return;
-    settingsPanel.classList.toggle("open", open);
-    settingsPanel.setAttribute("aria-hidden", String(!open));
-    settingsToggle.setAttribute("aria-expanded", String(open));
-  }
-  settingsToggle?.addEventListener("click", () => setSettings(!settingsPanel.classList.contains("open")));
-  settingsClose?.addEventListener("click", () => setSettings(false));
-  document.addEventListener("keydown", e => { if(e.key === "Escape") setSettings(false); });
+        <div class="feature-card">
 
-  const sideLang = document.getElementById("sideLanguage");
-  const mainLang = document.getElementById("language");
-  if(sideLang && mainLang){
-    sideLang.value = mainLang.value || "es";
-    sideLang.addEventListener("change", function(){
-      mainLang.value = sideLang.value;
-      mainLang.dispatchEvent(new Event("change", {bubbles:true}));
-    });
-    mainLang.addEventListener("change", function(){
-      sideLang.value = mainLang.value;
-    });
-  }
-});
-</script>
+            <div class="icon">🤖</div>
 
-</body></html>
+            <h3>Paiply AI</h3>
+
+            <p>
+                Un asistente inteligente que te ayudará a elegir los mejores picks y bans.
+            </p>
+
+        </div>
+
+        <div class="feature-card">
+
+            <div class="icon">🏆</div>
+
+            <h3>Draft Inteligente</h3>
+
+            <p>
+                Analiza composiciones, sinergias y counters en tiempo real.
+            </p>
+
+        </div>
+
+        <div class="feature-card">
+
+            <div class="icon">📊</div>
+
+            <h3>Estadísticas</h3>
+
+            <p>
+                Consulta win rate, pick rate y los mejores brawlers del meta.
+            </p>
+
+        </div>
+
+        <div class="feature-card">
+
+            <div class="icon">🗺️</div>
+
+            <h3>Mapas</h3>
+
+            <p>
+                Descubre los mejores brawlers para cada mapa y modo de juego.
+            </p>
+
+        </div>
+
+        <div class="feature-card">
+
+            <div class="icon">👥</div>
+
+            <h3>Comunidad</h3>
+
+            <p>
+                Comparte estrategias y aprende con otros jugadores.
+            </p>
+
+        </div>
+
+        <div class="feature-card">
+
+            <div class="icon">📱</div>
+
+            <h3>Aplicación</h3>
+
+            <p>
+                Instálala en tu teléfono o computadora como una app.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ======================================= -->
+<!-- CAPTURAS -->
+<!-- ======================================= -->
+
+<section id="screenshots" class="screenshots">
+
+    <div class="section-title">
+
+        <h2>Vista previa</h2>
+
+        <p>Así lucirá Paiply Draft Pro.</p>
+
+    </div>
+
+    <div class="gallery">
+
+        <div class="shot">
+            <img src="assets/images/screen1.png" alt="Captura 1">
+        </div>
+
+        <div class="shot">
+            <img src="assets/images/screen2.png" alt="Captura 2">
+        </div>
+
+        <div class="shot">
+            <img src="assets/images/screen3.png" alt="Captura 3">
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ======================================= -->
+<!-- DESCARGA -->
+<!-- ======================================= -->
+
+<section id="download" class="download">
+
+    <h2>Instala Paiply Draft Pro</h2>
+
+    <p>
+
+        Descarga la aplicación y disfruta de todas las funciones desde cualquier dispositivo.
+
+    </p>
+
+    <button id="installApp">
+
+        📲 Instalar Aplicación
+
+    </button>
+
+</section>
+
+<!-- ======================================= -->
+<!-- NOTICIAS -->
+<!-- ======================================= -->
+
+<section id="news" class="news">
+
+    <div class="section-title">
+
+        <h2>Últimas Noticias</h2>
+
+        <p>Mantente informado con todas las novedades de Brawl Stars.</p>
+
+    </div>
+
+    <div class="news-grid">
+
+        <article class="news-card">
+
+            <img src="assets/images/news1.jpg" alt="Actualización">
+
+            <div class="news-content">
+
+                <span class="news-tag">Actualización</span>
+
+                <h3>¡Nueva Temporada!</h3>
+
+                <p>Descubre todas las novedades, recompensas y cambios del último parche.</p>
+
+                <button class="read-more">Leer más</button>
+
+            </div>
+
+        </article>
+
+        <article class="news-card">
+
+            <img src="assets/images/news2.jpg" alt="Balance">
+
+            <div class="news-content">
+
+                <span class="news-tag">Balance</span>
+
+                <h3>Cambios de Balance</h3>
+
+                <p>Consulta todos los buffs y nerfs de los brawlers más utilizados.</p>
+
+                <button class="read-more">Leer más</button>
+
+            </div>
+
+        </article>
+
+        <article class="news-card">
+
+            <img src="assets/images/news3.jpg" alt="Eventos">
+
+            <div class="news-content">
+
+                <span class="news-tag">Evento</span>
+
+                <h3>Eventos Especiales</h3>
+
+                <p>Participa en los nuevos desafíos y consigue recompensas exclusivas.</p>
+
+                <button class="read-more">Leer más</button>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</section>
+
+<!-- ======================================= -->
+<!-- PAIPLY AI -->
+<!-- ======================================= -->
+
+<section id="assistant" class="assistant">
+
+    <div class="assistant-left">
+
+        <img src="assets/images/paiply.png" alt="Paiply AI">
+
+    </div>
+
+    <div class="assistant-right">
+
+        <h2>Conoce a Paiply AI</h2>
+
+        <p>
+
+            Paiply AI analizará tus partidas, recomendará los mejores picks, mostrará counters,
+            sinergias y consejos para mejorar tu rendimiento.
+
+        </p>
+
+        <ul>
+
+            <li>✅ Recomendaciones inteligentes</li>
+
+            <li>✅ Análisis del Draft</li>
+
+            <li>✅ Counters automáticos</li>
+
+            <li>✅ Estadísticas del Meta</li>
+
+            <li>✅ Consejos en tiempo real</li>
+
+        </ul>
+
+        <button class="primary">
+
+            Probar Paiply AI
+
+        </button>
+
+    </div>
+
+</section>
+
+<!-- ======================================= -->
+<!-- TESTIMONIOS -->
+<!-- ======================================= -->
+
+<section id="reviews" class="reviews">
+
+    <div class="section-title">
+
+        <h2>Opiniones</h2>
+
+        <p>Lo que dicen los jugadores.</p>
+
+    </div>
+
+    <div class="review-grid">
+
+        <div class="review-card">
+
+            ⭐⭐⭐⭐⭐
+
+            <h3>Carlos</h3>
+
+            <p>
+
+                "La mejor herramienta para hacer Draft."
+
+            </p>
+
+        </div>
+
+        <div class="review-card">
+
+            ⭐⭐⭐⭐⭐
+
+            <h3>Andrea</h3>
+
+            <p>
+
+                "Muy rápida, bonita y fácil de usar."
+
+            </p>
+
+        </div>
+
+        <div class="review-card">
+
+            ⭐⭐⭐⭐⭐
+
+            <h3>David</h3>
+
+            <p>
+
+                "Paiply AI es increíble."
+
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+  <!-- ======================================= -->
+<!-- PREGUNTAS FRECUENTES -->
+<!-- ======================================= -->
+
+<section id="faq" class="faq">
+
+    <div class="section-title">
+
+        <h2>Preguntas Frecuentes</h2>
+
+        <p>Resolvemos las dudas más comunes.</p>
+
+    </div>
+
+    <div class="faq-container">
+
+        <div class="faq-item">
+
+            <h3>📱 ¿La aplicación es gratuita?</h3>
+
+            <p>Sí, Paiply Draft Pro podrá utilizarse de forma gratuita.</p>
+
+        </div>
+
+        <div class="faq-item">
+
+            <h3>🎮 ¿Funciona en Android?</h3>
+
+            <p>Sí, podrás instalarla directamente desde el navegador.</p>
+
+        </div>
+
+        <div class="faq-item">
+
+            <h3>💻 ¿También funciona en PC?</h3>
+
+            <p>Sí, podrás instalarla en Windows usando Chrome o Edge.</p>
+
+        </div>
+
+        <div class="faq-item">
+
+            <h3>🤖 ¿Qué hace Paiply AI?</h3>
+
+            <p>Analiza el Draft, recomienda picks, muestra counters y ayuda a mejorar tus partidas.</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ======================================= -->
+<!-- CONTACTO -->
+<!-- ======================================= -->
+
+<section id="contact" class="contact">
+
+    <div class="section-title">
+
+        <h2>Contacto</h2>
+
+        <p>¿Quieres comunicarte con nosotros?</p>
+
+    </div>
+
+    <form class="contact-form">
+
+        <input
+            type="text"
+            placeholder="Tu nombre">
+
+        <input
+            type="email"
+            placeholder="Correo electrónico">
+
+        <textarea
+            rows="6"
+            placeholder="Escribe tu mensaje..."></textarea>
+
+        <button type="submit">
+
+            Enviar Mensaje
+
+        </button>
+
+    </form>
+
+</section>
+
+<!-- ======================================= -->
+<!-- FOOTER -->
+<!-- ======================================= -->
+
+<footer>
+
+    <div class="footer-logo">
+
+        <h2>PAIPLY DRAFT PRO</h2>
+
+        <p>La mejor herramienta para jugadores de Brawl Stars.</p>
+
+    </div>
+
+    <div class="footer-links">
+
+        <a href="#inicio">Inicio</a>
+
+        <a href="#features">Funciones</a>
+
+        <a href="#screenshots">Capturas</a>
+
+        <a href="#download">Descargar</a>
+
+    </div>
+
+    <div class="footer-social">
+
+        <a href="#">Discord</a>
+
+        <a href="#">YouTube</a>
+
+        <a href="#">TikTok</a>
+
+        <a href="#">X</a>
+
+    </div>
+
+    <p class="copyright">
+
+        © 2026 Paiply Draft Pro. Todos los derechos reservados.
+
+    </p>
+
+</footer>
+
+  <!-- ======================================= -->
+<!-- ESTADÍSTICAS -->
+<!-- ======================================= -->
+
+<section id="stats" class="stats">
+
+    <div class="section-title">
+
+        <h2>Paiply en números</h2>
+
+        <p>La comunidad sigue creciendo cada día.</p>
+
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h2 id="downloads">0</h2>
+
+            <p>Descargas</p>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h2 id="users">0</h2>
+
+            <p>Usuarios Activos</p>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h2 id="matches">0</h2>
+
+            <p>Drafts Analizados</p>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h2 id="rating">5.0★</h2>
+
+            <p>Calificación</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ======================================= -->
+<!-- BANNER FINAL -->
+<!-- ======================================= -->
+
+<section class="final-banner">
+
+    <h2>
+
+        ¿Listo para dominar Brawl Stars?
+
+    </h2>
+
+    <p>
+
+        Instala Paiply Draft Pro y mejora cada partida con inteligencia artificial.
+
+    </p>
+
+    <button id="installFinal">
+
+        🚀 Instalar Ahora
+
+    </button>
+
+</section>
+
+<!-- ======================================= -->
+<!-- BOTÓN VOLVER ARRIBA -->
+<!-- ======================================= -->
+
+<button id="backToTop">
+
+⬆
+
+</button>
+
+<!-- ======================================= -->
+<!-- SCRIPTS -->
+<!-- ======================================= -->
+
+<script src="js/app.js"></script>
+
+</body>
+
+</html>
